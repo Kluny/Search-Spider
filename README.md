@@ -7,12 +7,12 @@
 
 See what a search spider sees when it crawls your page.
 
-##Credits
+## Credits
 
-Icons: 
+### Icons
 Holly Wood
 
-Original Firefox extension: 
+### Original Firefox extension
 McNulty
 https://www.foxyseotool.com/
  
