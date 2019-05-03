@@ -16,4 +16,6 @@ Holly Wood
 McNulty
 https://www.foxyseotool.com/
  
+ ### Chrome Web Store
  
+ https://chrome.google.com/webstore/detail/search-spider/lodndgfmagmbigclhchbmcbgieijjekp
