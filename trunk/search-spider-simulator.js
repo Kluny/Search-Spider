@@ -28,7 +28,6 @@ function objectToListElement(obj) {
 
             var liText = document.createTextNode(' ' + obj[prop]);
             liElem.appendChild(liText);
-
             newUl.appendChild(liElem);
 
         }
@@ -41,6 +40,131 @@ function objectToListElement(obj) {
 
 /* ========================================================================= */
 
+function addLi(tag, text) {
+    tag = document.createElement(tag);
+    tag.innerText = text;
+    return tag;
+}
+
+function getHeadingsListElement() {
+    console.log('getHeadingsListElement');
+
+    var hs = ['h1', 'h2', 'h3', 'h4', 'h5'];
+
+    var newUl = document.createElement('ul');
+    for (var i = 0; i < hs.length; i++) {
+        var els = document.querySelectorAll(hs[i]);
+        newUl.appendChild(addLi('lh', "### " + hs[i]));
+
+        for (var h = 0; h < els.length; h++) {
+            newUl.appendChild(addLi('li', "- " + els[h].innerText));
+        }
+    }
+
+    return newUl;
+
+
+}
+
+/* ========================================================================= */
+
+function noscript(strCode){
+    strCode =  strCode.replace(/<head.*?>.*?<\/head>/igm, '');
+    strCode =  strCode.replace(/<script.*?>.*?<\/script>/igm, '');
+    strCode =  strCode.replace(/<style.*?>.*?<\/style>/igm, '');
+    strCode =  strCode.replace(/<meta.*?>.*?<\/meta>/igm, '');
+
+    return strCode;
+}
+
+/* ========================================================================= */
+
+function getContentLength() {
+    var minLength = 350;
+    var content = document.body[('innerText' in document.body) ? 'innerText' : 'textContent'];
+    content = noscript(content);
+    var contentLength = content.match(/\S+/g).length;
+    var liContentLength = document.createElement('li');
+    liContentLength.innerHTML = "<b>Word Count: </b>" + contentLength + ' / ' + minLength;
+    return liContentLength;
+}
+
+/* ========================================================================= */
+
+function getImgAltListElement() {
+    console.log('getImgAltListElement');
+
+    var imgList = document.createElement('ul');
+    var images = document.images;
+
+    for (var i = 0; i < images.length; i++) {
+
+        var img = images[i];
+
+        if (img.title) {
+            imgList.appendChild(addLi('lh', '### title: ' + img.title));
+        } else {
+            imgList.appendChild(addLi('lh', '### title: blank'));
+        }
+
+        imgList.appendChild(addLi('li', '- alt: ' + img.alt));
+        imgList.appendChild(addLi('li', '- width: ' + img.width));
+        imgList.appendChild(addLi('li', '- height: ' + img.height));
+
+        if (img.getAttribute('data-orig-size')) {
+            imgList.appendChild(addLi('li', '- data-orig-size: ' + img.getAttribute('data-orig-size')));
+        }
+
+        var a = document.createElement("a");
+        a.textContent = img.src;
+        a.setAttribute('href', img.src);
+        imgList.appendChild(document.createElement('li').appendChild(a));
+
+    }
+
+    return imgList;
+}
+
+function getTitleLength() {
+    var allowedLength = 60;
+
+    var li = document.createElement('li');
+    li.innerHTML = "<b>Title Length: </b>" + document.title.length + " / " + allowedLength;
+    return li;
+}
+
+function getMetaLength() {
+    var allowedLength = 160;
+    var metas = document.querySelectorAll('meta');
+    var metaLength;
+    var li = document.createElement('li');
+
+    li.innerHTML = "<b>No meta description</b>"
+    for (var i = 0; i < metas.length; i++) {
+        var metaName = metas[i].getAttribute('name');
+        if("description" === metaName) {
+            metaLength = metas[i].getAttribute('content').length;
+            li.innerHTML = "<b>Meta description Length: </b>" + metaLength + " / " + allowedLength;
+        }
+    }
+
+    return li;
+}
+
+/* ========================================================================= */
+
+function getContentElement() {
+    console.log('getContentElement');
+
+    var contentList = document.createElement('ul');
+
+    contentList.appendChild(getContentLength());
+    contentList.appendChild(getTitleLength());
+    contentList.appendChild(getMetaLength());
+
+    return contentList;
+}
+
 function getHeadMetaListElement() {
 
     console.log('getHeadMetaListElement');
@@ -51,20 +175,23 @@ function getHeadMetaListElement() {
         lastModified: document.lastModified
     };
 
+
     var metas = document.querySelectorAll('meta');
 
     for (var i = 0; i < metas.length; i++) {
-
         var metaName = metas[i].getAttribute('name');
-        if (metaName) obj['meta ' + metaName] = metas[i].getAttribute('content');
+
+        if (metaName) {
+            obj['meta ' + metaName] = metas[i].getAttribute('content');
+        }
 
     }
-
     var newUl = objectToListElement(obj);
 
     return newUl;
 
 }
+
 
 /* ========================================================================= */
 
@@ -128,14 +255,28 @@ function displayHeadElements() {
     div.appendChild(
         getHeadElementsCol(
             getHeadMetaListElement(),
-            'DOCUMENT'
+            '## DOCUMENT'
         )
     );
 
     div.appendChild(
         getHeadElementsCol(
-            getCookiesListElement(),
-            'COOKIES'
+            getHeadingsListElement(),
+            '## HEADINGS'
+        )
+    );
+
+    div.appendChild(
+        getHeadElementsCol(
+            getContentElement(),
+            '## CONTENT'
+        )
+    );
+
+    div.appendChild(
+        getHeadElementsCol(
+            getImgAltListElement(),
+            '## IMAGES'
         )
     );
 

@@ -77,6 +77,10 @@ ul::before {
 	content: 'UL' !important;
 }
 
+lh {
+    display: block;
+}
+
 ol::before {
 	content: 'OL' !important;
 }
@@ -301,4 +305,15 @@ a[rel='nofollow'], a[rel='nofollow'] *, a[rel='noindex'], a[rel='noindex'] * {
 
 .foxy-notification {
 	text-align: center !important;
+}
+
+span.header-elements {
+    cursor: pointer!important;
+    padding: 15px!important;
+    height: 20px!important;
+    width: 50px!important;
+    border: 1px solid black!important;
+    display: block!important;
+    position: relative!important;
+    vertical-align: middle;
 }
