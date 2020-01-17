@@ -3,7 +3,6 @@
 /* https://firefoxux.github.io/StyleGuide/#/colours */
 
 /* https://developer.mozilla.org/en/docs/Web/HTML/Element */
-
 * {
 	float: none !important;
 	position: static !important;
@@ -316,4 +315,13 @@ span.header-elements {
     display: block!important;
     position: relative!important;
     vertical-align: middle;
+}
+
+
+.green {
+    color: darkgreen!important;
+}
+
+.red {
+    color: darkred!important;
 }

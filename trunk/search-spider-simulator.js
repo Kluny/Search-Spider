@@ -68,15 +68,75 @@ function getHeadingsListElement() {
 
 /* ========================================================================= */
 
-function noscript(strCode){
-    strCode =  strCode.replace(/<head.*?>.*?<\/head>/igm, '');
-    strCode =  strCode.replace(/<script.*?>.*?<\/script>/igm, '');
-    strCode =  strCode.replace(/<style.*?>.*?<\/style>/igm, '');
-    strCode =  strCode.replace(/<meta.*?>.*?<\/meta>/igm, '');
+function noscript(strCode) {
+    strCode = strCode.replace(/<head.*?>.*?<\/head>/igm, '');
+    strCode = strCode.replace(/<script.*?>.*?<\/script>/igm, '');
+    strCode = strCode.replace(/<style.*?>.*?<\/style>/igm, '');
+    strCode = strCode.replace(/<meta.*?>.*?<\/meta>/igm, '');
 
     return strCode;
 }
 
+/* ========================================================================= */
+
+function getGTMKey(script) {
+    var uaRegex = "UA-[\\d]+-[\\d]+";
+    var uaCharCnt = 13;
+    var gtmRegex = "GTM-[A-Z1-9]+";
+    var gtmCharCnt = 11;
+
+    var data = '';
+
+    if (script.innerText) {
+        data = data + script.innerText;
+    }
+
+    if (script.getAttribute('src')) {
+        data = data + script.getAttribute('src');
+    }
+
+    var gtmPos = data.search(gtmRegex);
+    if (gtmPos > 0) {
+        var gtmLi = document.createElement('li');
+        gtmLi.setAttribute('class', 'green');
+        gtmLi.innerText = "Google Tag Manager: " + data.slice(gtmPos, gtmPos + gtmCharCnt);
+        return gtmLi;
+    }
+
+    var uaPos = data.search(uaRegex);
+
+    if (uaPos > 0) {
+        var uaLi = document.createElement('li');
+        uaLi.setAttribute('class', 'green');
+        uaLi.innerText = "Google App Id: " + data.slice(uaPos, uaPos + uaCharCnt);
+        return uaLi;
+    }
+
+    return false;
+}
+
+function getAnalyticsElement() {
+    var scripts = document.getElementsByTagName("script");
+    var scriptList = document.createElement('ul');
+    var found = false;
+    for (var i = 0; i < scripts.length; ++i) {
+        var googleTagManagerID = getGTMKey(scripts[i]);
+        if (false !== googleTagManagerID) {
+            scriptList.appendChild(googleTagManagerID);
+            found = true;
+        }
+    }
+
+    if(false === found) {
+        var notFound = document.createElement('li');
+        notFound.innerHTML = "No analytics found."
+        notFound.setAttribute('class', 'red');
+        scriptList.appendChild(notFound);
+    }
+
+    return scriptList;
+
+}
 /* ========================================================================= */
 
 function getContentLength() {
@@ -142,7 +202,7 @@ function getMetaLength() {
     li.innerHTML = "<b>No meta description</b>"
     for (var i = 0; i < metas.length; i++) {
         var metaName = metas[i].getAttribute('name');
-        if("description" === metaName) {
+        if ("description" === metaName) {
             metaLength = metas[i].getAttribute('content').length;
             li.innerHTML = "<b>Meta description Length: </b>" + metaLength + " / " + allowedLength;
         }
@@ -256,6 +316,13 @@ function displayHeadElements() {
         getHeadElementsCol(
             getHeadMetaListElement(),
             '## DOCUMENT'
+        )
+    );
+
+    div.appendChild(
+        getHeadElementsCol(
+            getAnalyticsElement(),
+            '## ANALYTICS'
         )
     );
 
