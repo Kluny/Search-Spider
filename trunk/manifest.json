@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Search Spider",
   "author": "Shannon Graham",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "See what a search spider sees when it crawls your page.",
   "homepage_url": "https://geeksonthebeach.ca/",
   "icons": {

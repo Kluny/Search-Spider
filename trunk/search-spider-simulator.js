@@ -80,8 +80,6 @@ function noscript(strCode) {
 /* ========================================================================= */
 
 function getGTMKey(script) {
-    var uaRegex = "UA-[\\d]+-[\\d]+";
-    var uaCharCnt = 13;
     var gtmRegex = "GTM-[A-Z1-9]+";
     var gtmCharCnt = 11;
 
@@ -103,6 +101,24 @@ function getGTMKey(script) {
         return gtmLi;
     }
 
+    return false;
+}
+
+function getUAKey(script) {
+    var uaRegex = "UA-[\\d]+-[\\d]+";
+    var uaCharCnt = 13;
+
+
+    var data = '';
+
+    if (script.innerText) {
+        data = data + script.innerText;
+    }
+
+    if (script.getAttribute('src')) {
+        data = data + script.getAttribute('src');
+    }
+
     var uaPos = data.search(uaRegex);
 
     if (uaPos > 0) {
@@ -118,20 +134,37 @@ function getGTMKey(script) {
 function getAnalyticsElement() {
     var scripts = document.getElementsByTagName("script");
     var scriptList = document.createElement('ul');
-    var found = false;
+    var uaFound = false;
+    var gtmFound = false;
+
+    var uaNotFound = document.createElement('li');
+    uaNotFound.innerHTML = "No UA key found."
+    uaNotFound.setAttribute('class', 'red');
+
+    var gtmNotFound = document.createElement('li');
+    gtmNotFound.innerHTML = "No GTM tag found."
+    gtmNotFound.setAttribute('class', 'red');
+
+
     for (var i = 0; i < scripts.length; ++i) {
         var googleTagManagerID = getGTMKey(scripts[i]);
         if (false !== googleTagManagerID) {
             scriptList.appendChild(googleTagManagerID);
-            found = true;
+            gtmFound = true;
+        }
+
+        var uaKey = getUAKey(scripts[i]);
+        if (false !== uaKey) {
+            scriptList.appendChild(uaKey);
+            uaFound = true;
         }
     }
 
-    if(false === found) {
-        var notFound = document.createElement('li');
-        notFound.innerHTML = "No analytics found."
-        notFound.setAttribute('class', 'red');
-        scriptList.appendChild(notFound);
+    if (!uaFound) {
+        scriptList.appendChild(uaNotFound);
+    }
+    if (!gtmFound) {
+        scriptList.appendChild(gtmNotFound);
     }
 
     return scriptList;
@@ -141,11 +174,22 @@ function getAnalyticsElement() {
 
 function getContentLength() {
     var minLength = 350;
+    var maxLength = 900;
+
     var content = document.body[('innerText' in document.body) ? 'innerText' : 'textContent'];
     content = noscript(content);
     var contentLength = content.match(/\S+/g).length;
+
     var liContentLength = document.createElement('li');
     liContentLength.innerHTML = "<b>Word Count: </b>" + contentLength + ' / ' + minLength;
+
+
+    if (contentLength < (minLength * 0.9 )) {
+        liContentLength.setAttribute('class', 'red');
+    } else if (contentLength > (minLength * 0.9) && contentLength < (maxLength * 1.1 )) {
+        liContentLength.setAttribute('class', 'green');
+    }
+
     return liContentLength;
 }
 
@@ -188,8 +232,17 @@ function getImgAltListElement() {
 function getTitleLength() {
     var allowedLength = 60;
 
+    var diff = Math.abs(allowedLength - document.title.length);
+
     var li = document.createElement('li');
     li.innerHTML = "<b>Title Length: </b>" + document.title.length + " / " + allowedLength;
+
+    if (diff > (allowedLength * 0.2 )) {
+        li.setAttribute('class', 'red');
+    } else {
+        li.setAttribute('class', 'green');
+    }
+
     return li;
 }
 
@@ -204,7 +257,16 @@ function getMetaLength() {
         var metaName = metas[i].getAttribute('name');
         if ("description" === metaName) {
             metaLength = metas[i].getAttribute('content').length;
+
+            var diff = Math.abs(allowedLength - metaLength);
+
             li.innerHTML = "<b>Meta description Length: </b>" + metaLength + " / " + allowedLength;
+
+            if (diff > (allowedLength * 0.2 )) {
+                li.setAttribute('class', 'red');
+            } else {
+                li.setAttribute('class', 'green');
+            }
         }
     }
 
